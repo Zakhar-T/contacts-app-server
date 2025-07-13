@@ -7,12 +7,13 @@ import { getEnvVar } from './utils/getEnvVar.js';
 import contactsRouter from './routes/contacts.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-// import { getAllContacts, getContactById } from './services/contacts.js';
 
 const PORT = getEnvVar('PORT');
 
 export const setupServer = () => {
   const app = express();
+
+  app.use(express.json());
 
   app.use(
     pino({
@@ -28,36 +29,9 @@ export const setupServer = () => {
       message: 'This is my Contact App',
     });
   });
-
-  app.use(contactsRouter);
-
-  // app.get('/contacts', async (req, res) => {
-  //   const contacts = await getAllContacts();
-  //   res.json({
-  //     status: 200,
-  //     message: 'Successfully found contacts!',
-  //     data: contacts,
-  //   });
-  // });
-
-  // app.get('/contacts/:id', async (req, res) => {
-  //   const { id } = req.params;
-  //   const contact = await getContactById(id);
-  //   if (!contact) {
-  //     res.status(404).json({
-  //       message: 'Contact not found',
-  //     });
-  //     return;
-  //   }
-  //   res.json({
-  //     status: 200,
-  //     message: `Successfully found contact with id: ${id}!`,
-  //     data: contact,
-  //   });
-  // });
+  app.use('/contacts', contactsRouter);
 
   app.use('', notFoundHandler);
-
   app.use(errorHandler);
 
   app.listen(PORT, (error) => {

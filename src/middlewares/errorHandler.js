@@ -3,11 +3,14 @@ import { HttpError } from 'http-errors';
 export const errorHandler = (err, req, res, next) => {
   if (err instanceof HttpError) {
     return res.status(err.status).json({
-      message: err.message,
+      status: err.status,
+      message: err.name,
+      data: err.message,
     });
   }
   res.status(500).json({
-    message: 'Internal server error',
-    error: err.message,
+    status: 500,
+    message: 'Something went wrong',
+    data: err.message,
   });
 };
