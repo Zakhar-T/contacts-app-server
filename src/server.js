@@ -4,7 +4,7 @@ import cors from 'cors';
 
 import { getEnvVar } from './utils/getEnvVar.js';
 
-import contactsRouter from './routes/contacts.js';
+import router from './routes/index.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -14,7 +14,6 @@ export const setupServer = () => {
   const app = express();
 
   app.use(express.json());
-
   app.use(
     pino({
       transport: {
@@ -29,7 +28,7 @@ export const setupServer = () => {
       message: 'This is my Contact App',
     });
   });
-  app.use('/contacts', contactsRouter);
+  app.use(router);
 
   app.use('', notFoundHandler);
   app.use(errorHandler);
