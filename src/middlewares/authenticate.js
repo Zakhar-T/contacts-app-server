@@ -3,7 +3,7 @@ import createHttpError from 'http-errors';
 import { usersCollection } from '../db/models/user.js';
 import { sessionsCollection } from '../db/models/session.js';
 
-export const auth = async (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization) throw createHttpError(401, 'Please provide access token');

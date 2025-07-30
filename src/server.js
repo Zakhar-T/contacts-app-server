@@ -15,13 +15,13 @@ export const setupServer = () => {
   const app = express();
 
   app.use(express.json());
-  // app.use(
-  //   pino({
-  //     transport: {
-  //       target: 'pino-pretty',
-  //     },
-  //   }),
-  // );
+  app.use(
+    pino({
+      transport: {
+        target: 'pino-pretty',
+      },
+    }),
+  );
   app.use(cors());
   app.use(cookieParser());
 

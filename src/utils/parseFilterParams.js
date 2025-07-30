@@ -14,7 +14,6 @@ function parseIsFavourite(value) {
 
 export const parseFilterParams = (query) => {
   const { type, isFavourite } = query;
-  console.log(isFavourite);
 
   const parsedType = parseType(type);
   const parsedIsFavourite = parseIsFavourite(isFavourite);
