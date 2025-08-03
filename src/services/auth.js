@@ -1,9 +1,12 @@
 import { randomBytes } from 'crypto';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import createHttpError from 'http-errors';
 import { usersCollection } from '../db/models/user.js';
 import { sessionsCollection } from '../db/models/session.js';
 import { FIFTEEN_MINUTES, THIRTY_DAYS } from '../constants/index.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
+import { sendMail } from '../utils/sendMail.js';
 
 export const registerUser = async (payload) => {
   const user = await usersCollection.findOne({ email: payload.email });
@@ -64,5 +67,56 @@ export const refreshSession = async (sessionId, refreshToken) => {
   return await sessionsCollection.create({
     userId: session.userId,
     ...newSession,
+  });
+};
+
+export const requestPasswordReset = async (email) => {
+  const user = await usersCollection.findOne({ email });
+
+  if (!user) return;
+
+  const token = jwt.sign(
+    {
+      sub: user._id,
+      name: user.name,
+    },
+    getEnvVar('JWT_SECRET'),
+    {
+      expiresIn: '5m',
+    },
+  );
+
+  await sendMail({
+    to: email,
+    subject: 'Reset password',
+    html: `<p>To reset password follow this <a href="${getEnvVar(
+      'APP_DOMAIN',
+    )}/reset-password?token=${token}">link</a></p>`,
+  });
+};
+
+export const resetPassword = async (password, token) => {
+  let entries;
+
+  try {
+    entries = jwt.verify(token, getEnvVar('JWT_SECRET'));
+  } catch (error) {
+    if (error.name === 'TokenExpiredError')
+      throw createHttpError(401, 'Token is expired');
+
+    if (error.name === 'JsonWebTokenError')
+      throw createHttpError(401, 'Token is unauthorized');
+
+    throw error;
+  }
+
+  const user = await usersCollection.findById(entries.sub);
+
+  if (!user) throw createHttpError(404, 'User not found');
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await usersCollection.findByIdAndUpdate(user._id, {
+    password: hashedPassword,
   });
 };
