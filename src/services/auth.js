@@ -1,12 +1,24 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { randomBytes } from 'crypto';
+
+import Handlebars from 'handlebars';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import createHttpError from 'http-errors';
+
 import { usersCollection } from '../db/models/user.js';
 import { sessionsCollection } from '../db/models/session.js';
+
 import { FIFTEEN_MINUTES, THIRTY_DAYS } from '../constants/index.js';
+
 import { getEnvVar } from '../utils/getEnvVar.js';
 import { sendMail } from '../utils/sendMail.js';
+
+const REQUEST_PWD_RESET_TEMPLATE = fs.readFileSync(
+  path.resolve('src/templates/request-pwd-reset.hbs'),
+  { encoding: 'utf-8' },
+);
 
 export const registerUser = async (payload) => {
   const user = await usersCollection.findOne({ email: payload.email });
@@ -86,12 +98,16 @@ export const requestPasswordReset = async (email) => {
     },
   );
 
+  const template = Handlebars.compile(REQUEST_PWD_RESET_TEMPLATE);
+
   await sendMail({
     to: email,
     subject: 'Reset password',
-    html: `<p>To reset password follow this <a href="${getEnvVar(
-      'APP_DOMAIN',
-    )}/reset-password?token=${token}">link</a></p>`,
+    html: template({
+      resetPasswordLink: `${getEnvVar(
+        'APP_DOMAIN',
+      )}/reset-password?token=${token}`,
+    }),
   });
 };
 
