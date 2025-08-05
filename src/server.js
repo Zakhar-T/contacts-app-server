@@ -8,6 +8,7 @@ import { getEnvVar } from './utils/getEnvVar.js';
 import router from './routes/index.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { UPLOAD_DIR } from './constants/index.js';
 
 const PORT = getEnvVar('PORT');
 
@@ -24,6 +25,7 @@ export const setupServer = () => {
   );
   app.use(cors());
   app.use(cookieParser());
+  app.use('/auth/uploads', express.static(UPLOAD_DIR));
 
   app.get('/', (req, res) => {
     res.json({
