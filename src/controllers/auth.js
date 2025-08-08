@@ -1,4 +1,6 @@
+import createHttpError from 'http-errors';
 import {
+  loginOrSignupWithGoogle,
   loginUser,
   logoutUser,
   refreshSession,
@@ -6,6 +8,7 @@ import {
   requestPasswordReset,
   resetPassword,
 } from '../services/auth.js';
+import { getGoogleOAuthUrl, validateCode } from '../utils/googleOAuth2.js';
 
 export const registerController = async (req, res) => {
   const user = await registerUser(req.body);
@@ -91,5 +94,43 @@ export const resetPasswordController = async (req, res) => {
     status: 200,
     message: 'Password was successfully reset',
     data: {},
+  });
+};
+
+export const getGoogleOAuthUrlController = async (req, res) => {
+  const url = await getGoogleOAuthUrl();
+
+  res.json({
+    status: 200,
+    message: 'Successfully get OAuth url!',
+    data: {
+      oauth_url: url,
+    },
+  });
+};
+
+export const confirmGoogleOAuthController = async (req, res) => {
+  const loginTicket = await validateCode(req.body.code);
+  const payload = loginTicket.getPayload();
+
+  if (!payload) throw createHttpError(401);
+
+  const session = await loginOrSignupWithGoogle(payload);
+
+  res.cookie('sessionId', session._id, {
+    httpOnly: true,
+    expire: session.refreshTokenValidUntil,
+  });
+  res.cookie('refreshToken', session.refreshToken, {
+    httpOnly: true,
+    expire: session.refreshTokenValidUntil,
+  });
+
+  res.json({
+    status: 200,
+    message: 'Successfully logged in via Google OAuth!',
+    data: {
+      accessToken: session.accessToken,
+    },
   });
 };

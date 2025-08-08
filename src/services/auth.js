@@ -136,3 +136,26 @@ export const resetPassword = async (password, token) => {
     password: hashedPassword,
   });
 };
+
+export const loginOrSignupWithGoogle = async (payload) => {
+  const { email, name } = payload;
+
+  let user = await usersCollection.findOne({ email });
+
+  if (user === null) {
+    const password = await bcrypt.hash(randomBytes(30).toString('base64'), 10);
+    user = await usersCollection.create({
+      email,
+      name,
+      password,
+    });
+  }
+
+  await sessionsCollection.deleteOne({ userId: user._id });
+  const newSession = createSession();
+
+  return await sessionsCollection.create({
+    userId: user._id,
+    ...newSession,
+  });
+};
