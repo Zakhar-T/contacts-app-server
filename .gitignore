@@ -1,3 +1,5 @@
+.googleOAuthSecret
+
 # Logs
 logs
 *.log
