@@ -1,0 +1,16 @@
+description: Not Found error
+content:
+  application/json:
+    schema:
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: integer
+          description: Status code
+          example: 404
+        message:
+          type: string
+          description: Error message
+          example: Not Found error

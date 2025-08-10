@@ -1,0 +1,22 @@
+description: Bad Request
+content:
+  application/json:
+    schema:
+      required:
+        - status
+        - message
+        - data
+      properties:
+        status:
+          type: integer
+          description: Status code
+          example: 400
+        message:
+          type: string
+          description: Error message
+          example: Bad Request
+        data:
+          type: array
+          items:
+            type: string
+            description: Error description
