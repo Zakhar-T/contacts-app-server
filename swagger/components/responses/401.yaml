@@ -1,0 +1,16 @@
+description: Unauthorized error
+content:
+  application/json:
+    schema:
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: integer
+          description: Status code
+          example: 401
+        message:
+          type: string
+          description: Error message
+          example: Unauthorized error
