@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-hw-mongodb",
+  "name": "contacts-app-server",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -12,10 +12,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Zakhar-T/nodejs-hw-mongodb.git"
+    "url": "git+https://github.com/Zakhar-T/contacts-app-server.git"
   },
   "keywords": [],
-  "author": "Zakhar <zakhar.null@gmail.com>",
+  "author": "Zakhar <zakhar.klym25@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.30.1",
